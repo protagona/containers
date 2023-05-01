@@ -1,0 +1,4 @@
+services:
+  devcontainer:
+    privileged: true
+    image: devcontainer:0.0.1-amazonlinux2023-linux-arm64

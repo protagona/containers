@@ -1,0 +1,3 @@
+if { mkdir -p /var/log/dockerd }
+if { chown nobody:nogroup /var/log/dockerd }
+chmod 02755 /var/log/dockerd

@@ -1,0 +1,4 @@
+pip
+black
+isort
+cfn-lint

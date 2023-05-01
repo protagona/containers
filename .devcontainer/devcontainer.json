@@ -1,0 +1,13 @@
+{
+  "name": "devcontainer",
+  "dockerComposeFile": ["docker-compose.yml", "docker-compose.overrides.yml"],
+  "service": "devcontainer",
+  "remoteUser": "developer",
+  "workspaceFolder": "/home/developer/workspaces",
+  "customizations": {
+    "vscode": {
+      "extensions": ["mutantdino.resourcemonitor"],
+      "settings": {}
+    }
+  }
+}

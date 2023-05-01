@@ -1,0 +1,46 @@
+# yaml-language-server: $schema = https://json.schemastore.org/circleciconfig.json
+version: 2.1
+
+jobs:
+  build:
+    parameters:
+      image:
+        description: Machine image name
+        type: string
+      resource_class:
+        description: Resource class of machine
+        type: string
+      image_name:
+        description: Named to be used for image in Docker Registry (don't include the tag)
+        type: string
+      platform:
+        description: Platform for image
+        type: string
+    machine:
+      image: << parameters.image >>
+    resource_class: << parameters.resource_class >>
+    steps:
+      - checkout
+      - run:
+          name: Docker Build
+          command: |
+            make -C << parameters.image_name >> build/<< parameters.platform >>
+
+workflows:
+  build:
+    jobs:
+      - build:
+          name: Build and Publish linux/arm64
+          image: ubuntu-2204:2023.04.2
+          resource_class: arm.medium
+          image_name: amazonlinux
+          platform: linux/arm64
+          context: cloudmagick
+
+      - build:
+          name: Build and Publish linux/amd64
+          image: ubuntu-2204:2023.04.2
+          resource_class: medium
+          image_name: amazonlinux
+          platform: linux/amd64
+          context: cloudmagick

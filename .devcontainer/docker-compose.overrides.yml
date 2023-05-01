@@ -1,0 +1,51 @@
+services:
+  devcontainer:
+    volumes:
+      - /Users/maestro/workspaces:/home/developer/workspaces
+
+#       # Add your AWS config for access within the dev container
+#       - $HOME/.aws:/home/developer/.aws
+
+#       # Add your SSH key pairs so that git and other SSH services work
+#       - $HOME/.ssh:/home/developer/.ssh
+
+#       # --- named volumes ---
+#       # vscode extensions
+#       - vscode:/home/developer/.vscode-server/extensions
+
+#       # persist docker resources - i.e. images, volumes, etc...
+#       - docker:/var/lib/docker
+
+#       # shell history
+#       - commandhistory:/home/developer/.commandhistory
+
+#       # asdf tools
+#       - asdf:/home/developer/.asdf
+
+#       # --- end named volumes ---
+
+volumes:
+  workspaces:
+#   asdf:
+#     name: asdf-shared
+#   commandhistory:
+#     name: commandhistory-shared
+#   docker:
+#     name: docker-shared
+#   vscode:
+#     name: vscode-shared
+
+# x-mutagen:
+#   sync:
+#     defaults:
+#       ignore:
+#         vcs: true
+#         paths:
+#           - node_modules
+#           - .venv
+#           - .pytest_cache
+#           - __pycache__
+#           - .docker_cache
+#     workspace:
+#       alpha: "/Users/maestro/workspaces"
+#       beta: "volume://workspaces"

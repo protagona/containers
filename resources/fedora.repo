@@ -1,0 +1,43 @@
+[docker-ce-stable]
+name=Docker CE Stable - $basearch
+baseurl=https://download.docker.com/linux/fedora/37/$basearch/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/fedora/gpg
+
+[fedora]
+name=Fedora 38 - $basearch
+#baseurl=http://download.example/pub/fedora/linux/releases/38/Everything/$basearch/os/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-38&arch=$basearch
+enabled=1
+countme=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-38-$basearch
+skip_if_unavailable=False
+
+[fedora-debuginfo]
+name=Fedora 38 - $basearch - Debug
+#baseurl=http://download.example/pub/fedora/linux/releases/38/Everything/$basearch/debug/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-debug-38&arch=$basearch
+enabled=0
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-38-$basearch
+skip_if_unavailable=False
+
+[fedora-source]
+name=Fedora 38 - Source
+#baseurl=http://download.example/pub/fedora/linux/releases/38/Everything/source/tree/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-source-38&arch=$basearch
+enabled=0
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-38-$basearch
+skip_if_unavailable=False
