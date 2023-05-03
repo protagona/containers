@@ -2,7 +2,9 @@
 version: 2.1
 
 jobs:
-  build_and_publish:
+  build:
+    machine:
+      image: << parameters.image >>
     parameters:
       image:
         description: Machine image name
@@ -22,50 +24,121 @@ jobs:
       namespace:
         description: Docker Registry to push image to
         type: string
-    machine:
-      image: << parameters.image >>
     resource_class: << parameters.resource_class >>
     steps:
       - checkout
       - run:
+          command: |
+            echo "$GHCR_TOKEN" | docker login -u "$GHCR_USER" --password-stdin ghcr.io
+      - run:
           name: Docker Build
           command: |
             make -C << parameters.image_name >> build/<< parameters.platform >>
-      - when:
-          condition: << pipeline.git.branch >> == "initial-setup"
-          steps:
-            - run:
-                name: Docker Push
-                command: |
-                  printf "token --> %s\n" "$GHCR_TOKEN"
-                  printf "registry --> %s\n" "<< parameters.registry >>"
-                  printf "username --> %s\n" "$GHCR_USER"
-                  printf "names --> %s\n" "<< parameters.namespace >>"
-                  # make -C << parameters.image_name >> push/<< parameters.platform >> \
-                  #   token="$GHCR_TOKEN" \
-                  #   registry='<< parameters.registry >>' \
-                  #   username="$GHCR_USER"
-                  #   namespace='<< parameters.namespace >>'
+      - run:
+          name: Docker Publish
+          command: |
+            make -C << parameters.image_name >> push/<< parameters.platform >> \
+              token="$GHCR_TOKEN" \
+              registry='<< parameters.registry >>' \
+              username="$GHCR_USER" \
+              namespace='<< parameters.namespace >>'
+
+  publish:
+    machine:
+      image: << parameters.image >>
+    parameters:
+      image:
+        description: Machine image name
+        type: string
+      resource_class:
+        description: Resource class of machine
+        type: string
+      image_name:
+        description: Named to be used for image in Docker Registry (don't include the tag)
+        type: string
+      registry:
+        description: Docker Registry to push image to
+        type: string
+      namespace:
+        description: Docker Registry to push image to
+        type: string
+    resource_class: << parameters.resource_class >>
+    steps:
+      - checkout
+      - run:
+          name: Docker Create Manifest
+          command: |
+            make -C << parameters.image_name >> push/manifest \
+              token="$GHCR_TOKEN" \
+              registry='<< parameters.registry >>' \
+              username="$GHCR_USER" \
+              namespace='<< parameters.namespace >>'
 
 workflows:
   main:
     jobs:
-      - build_and_publish:
-          name: Build and Publish linux/arm64
+      - build:
+          name: Build << matrix.image_name >> linux/amd64
           image: ubuntu-2204:2023.04.2
-          resource_class: arm.medium
-          image_name: amazonlinux
-          platform: linux/arm64
           context: protagona
-          registry: ghcr.io
+          resource_class: large
+          platform: linux/amd64
           namespace: protagona
+          registry: ghcr.io
+          matrix:
+            parameters:
+              image_name:
+                - cicd-test
+                - amazonlinux
+                - fedora
 
-      - build_and_publish:
-          name: Build and Publish linux/amd64
+      - build:
+          name: "Build << matrix.image_name >> linux/arm64"
           image: ubuntu-2204:2023.04.2
+          context: protagona
+          resource_class: arm.large
+          platform: linux/arm64
+          namespace: protagona
+          registry: ghcr.io
+          matrix:
+            parameters:
+              image_name:
+                - cicd-test
+                - amazonlinux
+                - fedora
+
+      - publish:
+          requires:
+            - Build cicd-test linux/amd64
+            - Build cicd-test linux/arm64
+          name: Publish cicd-test multi-platform manifest
+          image: ubuntu-2204:2023.04.2
+          context: protagona
+          namespace: protagona
+          registry: ghcr.io
+          resource_class: medium
+          image_name: cicd-test
+
+      - publish:
+          requires:
+            - Build amazonlinux linux/amd64
+            - Build amazonlinux linux/arm64
+          name: Publish amazonlinux multi-platform manifest
+          image: ubuntu-2204:2023.04.2
+          context: protagona
+          namespace: protagona
+          registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux
-          platform: linux/amd64
-          context: cloudmagick
-          registry: ghcr.io
+
+      - publish:
+          requires:
+            - Build fedora linux/amd64
+            - Build fedora linux/arm64
+          name: Publish fedora multi-platform manifest
+          image: ubuntu-2204:2023.04.2
+          context: protagona
           namespace: protagona
+          registry: ghcr.io
+          resource_class: medium
+          image_name: fedora

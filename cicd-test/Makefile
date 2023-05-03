@@ -1,5 +1,5 @@
 version_file := .version
-image_name := devcontainer
+image_name := cicd-test
 image_os := amazonlinux2023
 image_version := $(strip $(shell cat $(version_file)))
 

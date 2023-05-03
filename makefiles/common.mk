@@ -2,7 +2,6 @@
 .SHELLFLAGS := -eu -o pipefail -c
 .SECONDEXPANSION:
 SHELL := bash
-.SILENT:
 
 # $(call image_tag,<image_name>,<image_version>,<image_os>,<platform>)
 image_tag = $1:$2-$3$(if $4,-$(subst /,-,$4),)
