@@ -16,7 +16,6 @@ RUN dnf update -y && dnf install --allowerasing -y \
     git \
     openssl \
     bash \
-    zsh \
     python3 \
     jq \
     vim \
@@ -54,10 +53,6 @@ SHELL ["bash", "-lc"]
 # asdf tool version manager
 RUN git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.11.3 \
     && source $HOME/.asdf/asdf.sh && asdf update
-
-# ohmyzsh cli framework
-RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | bash \
-    && git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 
 # default bash and zsh .dotfile setup
 COPY resources/.bashrc $HOME/.bashrc
@@ -106,17 +101,7 @@ RUN sudo dnf install -y \
     fzf \
     tealdeer
 
-# shell config directories
-COPY resources/.zshrc.d $HOME/.zshrc.d
-COPY resources/.bashrc.d $HOME/.bashrc.d
-
 # application-specific configuration
 COPY resources/direnv.toml $HOME/.config/direnv/direnv.toml
-
-# create directories to ensure user ownership
-RUN mkdir -p \
-    $HOME/workspaces \
-    $HOME/.commandhistory \
-    $HOME/.vscode-server
 
 ENTRYPOINT ["/init"]
