@@ -51,16 +51,16 @@ RUN dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 SHELL ["bash", "-lc"]
 
 # asdf tool version manager
-RUN git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.11.3 \
-    && source $HOME/.asdf/asdf.sh && asdf update
+RUN git clone https://github.com/asdf-vm/asdf.git /root/.asdf --branch v0.11.3 \
+    && source /root/.asdf/asdf.sh && asdf update
 
 # default bash and zsh .dotfile setup
-COPY resources/.bashrc $HOME/.bashrc
-COPY resources/.zshrc $HOME/.zshrc
+COPY resources/.bashrc /root/.bashrc
+COPY resources/.zshrc /root/.zshrc
 
 # asdf default tool packages
-COPY resources/.default-python-packages $HOME/.default-python-packages
-COPY resources/.default-npm-packages $HOME/.default-npm-packages
+COPY resources/.default-python-packages /root/.default-python-packages
+COPY resources/.default-npm-packages /root/.default-npm-packages
 
 # Default plugins with versions to be installed upon initial use
 RUN asdf plugin-add nodejs \
@@ -97,11 +97,7 @@ RUN asdf plugin add make
 RUN asdf install make 4.4.1
 RUN asdf global make 4.4.1
 
-RUN sudo dnf install -y \
-    fzf \
-    tealdeer
-
 # application-specific configuration
-COPY resources/direnv.toml $HOME/.config/direnv/direnv.toml
+COPY resources/direnv.toml /root/.config/direnv/direnv.toml
 
 ENTRYPOINT ["/init"]
