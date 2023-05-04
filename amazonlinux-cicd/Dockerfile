@@ -1,9 +1,4 @@
-FROM public.ecr.aws/docker/library/fedora:38
-
-ARG USER=developer
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-ARG HOME=/home/$USER
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
 # install base packages
 RUN dnf update -y && dnf install --allowerasing -y \
@@ -47,29 +42,14 @@ RUN dnf install -y \
     python-devel \
     python3-devel
 
-COPY resources/docker.repo /etc/yum.repos.d/docker.repo
+# add docker and fedora 38 package repositories
+COPY --from=fedora:38 /etc/pki/rpm-gpg /etc/pki/rpm-gpg
+COPY resources/fedora.repo /etc/yum.repos.d/fedora.repo
 
 # docker install
 RUN dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# modern utils
-RUN dnf install -y \
-    fd-find \
-    ripgrep \
-    bat
-
-# setup user
-RUN groupadd --gid $USER_GID $USER \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USER \
-    && echo $USER ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USER \
-    && chmod 0440 /etc/sudoers.d/$USER \
-    && chown $USER_ID:$USER_GID /home/$USER
-
-RUN usermod -aG docker $USER
-
-USER ${USER}
 SHELL ["bash", "-lc"]
-WORKDIR ${HOME}
 
 # asdf tool version manager
 RUN git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.11.3 \
@@ -80,12 +60,12 @@ RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/in
     && git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 
 # default bash and zsh .dotfile setup
-COPY --chown=${USER_UID}:${USER_GID} resources/.bashrc $HOME/.bashrc
-COPY --chown=${USER_UID}:${USER_GID} resources/.zshrc $HOME/.zshrc
+COPY resources/.bashrc $HOME/.bashrc
+COPY resources/.zshrc $HOME/.zshrc
 
 # asdf default tool packages
-COPY --chown=${USER_UID}:${USER_GID} resources/.default-python-packages $HOME/.default-python-packages
-COPY --chown=${USER_UID}:${USER_GID} resources/.default-npm-packages $HOME/.default-npm-packages
+COPY resources/.default-python-packages $HOME/.default-python-packages
+COPY resources/.default-npm-packages $HOME/.default-npm-packages
 
 # Default plugins with versions to be installed upon initial use
 RUN asdf plugin-add nodejs \
@@ -127,40 +107,16 @@ RUN sudo dnf install -y \
     tealdeer
 
 # shell config directories
-COPY --chown=${USER_UID}:${USER_GID} resources/.zshrc.d $HOME/.zshrc.d
-COPY --chown=${USER_UID}:${USER_GID} resources/.bashrc.d $HOME/.bashrc.d
+COPY resources/.zshrc.d $HOME/.zshrc.d
+COPY resources/.bashrc.d $HOME/.bashrc.d
 
 # application-specific configuration
-COPY --chown=${USER_UID}:${USER_GID} resources/direnv.toml $HOME/.config/direnv/direnv.toml
+COPY resources/direnv.toml $HOME/.config/direnv/direnv.toml
 
 # create directories to ensure user ownership
 RUN mkdir -p \
     $HOME/workspaces \
     $HOME/.commandhistory \
     $HOME/.vscode-server
-
-USER root
-
-# docker daemon configuration
-COPY resources/etc/docker /etc/docker
-
-# s6-overlay service manager
-ARG S6_OVERLAY_VERSION=3.1.4.2
-RUN curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz | tar -Jxp -C / && \
-    curl -L https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-$(uname -m).tar.xz | tar -Jxp -C /
-RUN groupadd nogroup && usermod -aG nogroup nobody
-ENV S6_KEEP_ENV=1
-
-# copy dockerd s6-overlay service configuration
-COPY resources/etc/s6-overlay /etc/s6-overlay
-
-
-ENV USER="${USER}"
-ENV SHELL="/bin/zsh"
-ENV EDITOR="vim"
-ENV TERM="xterm-256color"
-ENV PROMPT_COMMAND="history -a"
-ENV HISTFILE="/home/${USER}/.commandhistory/shell_history"
-ENV HISTSIZE="10000"
 
 ENTRYPOINT ["/init"]

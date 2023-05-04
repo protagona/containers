@@ -159,7 +159,7 @@ COPY resources/etc/s6-overlay /etc/s6-overlay
 
 ENV USER="${USER}"
 ENV SHELL="/bin/zsh"
-ENV EDITOR="code"
+ENV EDITOR="vim"
 ENV TERM="xterm-256color"
 ENV PROMPT_COMMAND="history -a"
 ENV HISTFILE="/home/${USER}/.commandhistory/shell_history"
