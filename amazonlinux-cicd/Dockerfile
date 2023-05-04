@@ -49,14 +49,14 @@ COPY resources/fedora.repo /etc/yum.repos.d/fedora.repo
 RUN dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 SHELL ["bash", "-lc"]
+ENV HOME=/root
 
 # asdf tool version manager
 RUN git clone https://github.com/asdf-vm/asdf.git /root/.asdf --branch v0.11.3 \
     && source /root/.asdf/asdf.sh && asdf update
 
-# default bash and zsh .dotfile setup
-COPY resources/.bashrc /root/.bashrc
-COPY resources/.zshrc /root/.zshrc
+# use .bash_profile to ensure root user has asdf available
+COPY resources/.bashrc /root/.bash_profile
 
 # asdf default tool packages
 COPY resources/.default-python-packages /root/.default-python-packages
