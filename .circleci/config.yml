@@ -93,6 +93,7 @@ workflows:
                 - fedora
                 - amazonlinux-slim
                 - amazonlinux-cicd
+                - amazonlinux-cicd-slim
 
       - build:
           name: "Build << matrix.image_name >> linux/arm64"
@@ -110,6 +111,7 @@ workflows:
                 - fedora
                 - amazonlinux-slim
                 - amazonlinux-cicd
+                - amazonlinux-cicd-slim
 
       - publish:
           requires:
@@ -122,6 +124,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: cicd-test
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -134,6 +140,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -146,6 +156,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: fedora
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -158,6 +172,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux-slim
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -170,3 +188,23 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux-cicd
+          filters:
+            branches:
+              only:
+                - main
+
+      - publish:
+          requires:
+            - Build amazonlinux-cicd-slim linux/amd64
+            - Build amazonlinux-cicd-slim linux/arm64
+          name: Publish amazonlinux-cicd-slim multi-platform manifest
+          image: ubuntu-2204:2023.04.2
+          context: protagona
+          namespace: protagona
+          registry: ghcr.io
+          resource_class: medium
+          image_name: amazonlinux-cicd-slim
+          filters:
+            branches:
+              only:
+                - main

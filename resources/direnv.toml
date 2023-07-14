@@ -2,4 +2,8 @@
 load_dotenv = true
 
 [whitelist]
-prefix = ["/home/developer/workspace"]
+prefix = [
+    "/home/developer/workspace",
+    "/wrk",
+    "/work"
+]
