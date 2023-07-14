@@ -1,6 +1,6 @@
 version_file := .version
-image_name := devcontainer
-image_os := amazonlinux2023-cicd-slim
+image_name := cicd
+image_os := amazonlinux2023
 image_version := $(strip $(shell cat $(version_file)))
 
 registry := 
