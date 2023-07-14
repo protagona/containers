@@ -93,6 +93,7 @@ workflows:
                 - fedora
                 - amazonlinux-slim
                 - amazonlinux-cicd
+                - amazonlinux-cicd-slim
 
       - build:
           name: "Build << matrix.image_name >> linux/arm64"
@@ -102,6 +103,10 @@ workflows:
           platform: linux/arm64
           namespace: protagona
           registry: ghcr.io
+          filters:
+            branches:
+              only:
+                - main
           matrix:
             parameters:
               image_name:
@@ -170,3 +175,15 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux-cicd
+
+      - publish:
+          requires:
+            - Build amazonlinux-cicd-slim linux/amd64
+            - Build amazonlinux-cicd-slim linux/arm64
+          name: Publish amazonlinux-cicd-slim multi-platform manifest
+          image: ubuntu-2204:2023.04.2
+          context: protagona
+          namespace: protagona
+          registry: ghcr.io
+          resource_class: medium
+          image_name: amazonlinux-cicd-slim
