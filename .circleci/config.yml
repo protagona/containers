@@ -103,10 +103,6 @@ workflows:
           platform: linux/arm64
           namespace: protagona
           registry: ghcr.io
-          filters:
-            branches:
-              only:
-                - main
           matrix:
             parameters:
               image_name:
@@ -115,6 +111,7 @@ workflows:
                 - fedora
                 - amazonlinux-slim
                 - amazonlinux-cicd
+                - amazonlinux-cicd-slim
 
       - publish:
           requires:
@@ -127,6 +124,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: cicd-test
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -139,6 +140,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -151,6 +156,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: fedora
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -163,6 +172,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux-slim
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -175,6 +188,10 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux-cicd
+          filters:
+            branches:
+              only:
+                - main
 
       - publish:
           requires:
@@ -187,3 +204,7 @@ workflows:
           registry: ghcr.io
           resource_class: medium
           image_name: amazonlinux-cicd-slim
+          filters:
+            branches:
+              only:
+                - main
