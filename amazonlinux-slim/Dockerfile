@@ -144,3 +144,4 @@ ENV HISTFILE="/home/${USER}/.commandhistory/shell_history"
 ENV HISTSIZE="10000"
 
 ENTRYPOINT ["/init"]
+
